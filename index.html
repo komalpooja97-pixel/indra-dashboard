@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settlement Analysis Agent — Cognizant</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #041e42;
+  --navy2: #0a2d5e;
+  --blue: #1a5fd4;
+  --blue-light: #3b82f6;
+  --cyan: #00c6e0;
+  --red: #e53935;
+  --amber: #f59e0b;
+  --green: #10b981;
+  --bg: #f0f4fa;
+  --card: #ffffff;
+  --border: #dde5f0;
+  --text: #0f1f38;
+  --muted: #5e7494;
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Syne', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: var(--navy);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  border-bottom: 2px solid var(--cyan);
+}
+.header-logo {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.header-logo span { color: var(--cyan); }
+.header-meta {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: #8aa5cc;
+  text-align: right;
+  line-height: 1.6;
+}
+
+/* NAV TABS */
+.nav-tabs {
+  background: var(--navy2);
+  display: flex;
+  gap: 2px;
+  padding: 0 32px;
+  overflow-x: auto;
+}
+.nav-tab {
+  font-family: var(--display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8aa5cc;
+  padding: 12px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.nav-tab:hover { color: #fff; }
+.nav-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+/* MAIN LAYOUT */
+.main { display: flex; min-height: calc(100vh - 98px); }
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: var(--navy);
+  padding: 24px 16px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: #4a6a99;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 12px 4px;
+}
+.agent-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: none;
+  border: 1px solid transparent;
+  color: #8aa5cc;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 400;
+  text-align: left;
+  transition: all 0.2s;
+  width: 100%;
+}
+.agent-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.agent-btn.active { background: rgba(0,198,224,0.1); border-color: rgba(0,198,224,0.3); color: var(--cyan); }
+.agent-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-cyan { background: var(--cyan); }
+.dot-blue { background: var(--blue-light); }
+.dot-green { background: var(--green); }
+.dot-amber { background: var(--amber); }
+.dot-red { background: var(--red); }
+.agent-number {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: #4a6a99;
+  margin-left: auto;
+}
+
+/* CONTENT */
+.content { flex: 1; padding: 28px 32px; overflow-y: auto; }
+
+/* SECTION */
+.section { display: none; }
+.section.active { display: block; }
+
+/* PAGE TITLE */
+.page-title {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.page-sub {
+  font-size: 0.84rem;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+/* STAT CARDS */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.stat-card.cyan::before { background: var(--cyan); }
+.stat-card.red::before { background: var(--red); }
+.stat-card.amber::before { background: var(--amber); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.blue::before { background: var(--blue); }
+.stat-value {
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* UPLOAD AREA */
+.upload-area {
+  background: var(--card);
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  margin-bottom: 24px;
+  transition: border-color 0.2s;
+}
+.upload-area:hover { border-color: var(--blue-light); }
+.upload-area label {
+  font-family: var(--display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--navy);
+  display: block;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.upload-area input { display: none; }
+.upload-btn {
+  display: inline-block;
+  background: var(--navy);
+  color: #fff;
+  font-family: var(--display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  margin-top: 12px;
+  transition: background 0.2s;
+}
+.upload-btn:hover { background: var(--blue); }
+
+/* STATUS MESSAGE */
+.status-msg {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  margin-bottom: 20px;
+  font-family: var(--mono);
+  border: 1px solid var(--border);
+  background: #f8faff;
+  color: var(--muted);
+}
+.status-msg.loading { border-color: var(--blue-light); background: #eff6ff; color: var(--blue); }
+.status-msg.success { border-color: var(--green); background: #ecfdf5; color: #065f46; }
+.status-msg.error { border-color: var(--red); background: #fef2f2; color: #991b1b; }
+
+/* RESULTS TABLE */
+.table-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.table-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.table-title {
+  font-family: var(--display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+table { width: 100%; border-collapse: collapse; }
+th {
+  background: var(--navy);
+  color: #8aa5cc;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 500;
+}
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f4fa;
+  font-size: 0.82rem;
+  vertical-align: top;
+  line-height: 1.5;
+}
+tr:last-child td { border-bottom: none; }
+tr.critical td { background: #fff5f5; }
+tr.warning td { background: #fffbeb; }
+tr:hover td { background: #f8faff !important; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+.badge-critical { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.badge-warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.badge-ok { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+
+/* CHAT PANEL */
+.chat-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+}
+.chat-header {
+  background: var(--navy);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.chat-header-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.chat-header-title {
+  font-family: var(--display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+}
+.chat-header-sub {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: #4a6a99;
+  margin-left: auto;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #f8faff;
+}
+.chat-msg {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+.chat-msg.user {
+  align-self: flex-end;
+  background: var(--navy);
+  color: #e0eaff;
+  border-bottom-right-radius: 4px;
+}
+.chat-msg.agent {
+  align-self: flex-start;
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.chat-msg.agent .msg-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--cyan);
+  margin-bottom: 6px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.chat-input-row {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  background: #fff;
+}
+.chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 0.84rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.chat-input:focus { border-color: var(--blue-light); }
+.chat-send {
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: var(--display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.chat-send:hover { background: var(--blue); }
+.chat-send:disabled { background: #ccc; cursor: not-allowed; }
+
+/* QUICK QUESTIONS */
+.quick-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.quick-btn {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.76rem;
+  color: var(--navy);
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.2s;
+}
+.quick-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+/* AGENT CARDS */
+.agent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.agent-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.agent-card-num {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.agent-card-name {
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.agent-card-desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.agent-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tag {
+  background: #eef4ff;
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #d4e4ff;
+}
+.agent-card-status {
+  position: absolute;
+  top: 16px; right: 16px;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.status-live { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+
+/* TWO COL */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+/* INFO BOX */
+.info-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.info-box-title {
+  font-family: var(--display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f4fa;
+  font-size: 0.82rem;
+}
+.info-row:last-child { border-bottom: none; }
+.info-key { color: var(--muted); }
+.info-val { font-family: var(--mono); font-size: 0.8rem; color: var(--navy); font-weight: 500; }
+
+/* LOADING SPINNER */
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid #ddd;
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+.empty-state-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.84rem; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">Settlement <span>Analysis</span> Agent</div>
+  <div class="header-meta">
+    Cognizant — Power, Utilities & Renewables<br>
+    GCP Conversational Agents · gemini-2.5-flash
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
+  <button class="nav-tab" onclick="showTab('analyse')">Anomaly Detection</button>
+  <button class="nav-tab" onclick="showTab('chat')">AI Agent Chat</button>
+  <button class="nav-tab" onclick="showTab('agents')">All 5 Agents</button>
+  <button class="nav-tab" onclick="showTab('cfo')">CFO Summary</button>
+</div>
+
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-label">Active Agents</div>
+    <button class="agent-btn active" onclick="switchAgent('settlement')">
+      <span class="agent-dot dot-cyan"></span>
+      Settlement Analysis
+      <span class="agent-number">A1</span>
+    </button>
+    <button class="agent-btn" onclick="switchAgent('financial')">
+      <span class="agent-dot dot-blue"></span>
+      Financial Impact
+      <span class="agent-number">A2</span>
+    </button>
+    <button class="agent-btn" onclick="switchAgent('compliance')">
+      <span class="agent-dot dot-green"></span>
+      Rules & Compliance
+      <span class="agent-number">A3</span>
+    </button>
+    <button class="agent-btn" onclick="switchAgent('nlp')">
+      <span class="agent-dot dot-amber"></span>
+      NLP Explainability
+      <span class="agent-number">A4</span>
+    </button>
+    <button class="agent-btn" onclick="switchAgent('dispute')">
+      <span class="agent-dot dot-red"></span>
+      Action & Dispute
+      <span class="agent-number">A5</span>
+    </button>
+
+    <div class="sidebar-label" style="margin-top:16px">Project Info</div>
+    <div style="padding:10px 12px; font-size:0.75rem; color:#4a6a99; line-height:1.7;">
+      Project: Settlement Agent<br>
+      GCP: us-central1<br>
+      Model: gemini-2.5-flash<br>
+      Stack: Free Tier
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- DASHBOARD TAB -->
+    <div id="tab-dashboard" class="section active">
+      <div class="page-title">Operations Dashboard</div>
+      <div class="page-sub">US Utility Settlement Analysis — Real-time anomaly detection and financial exposure tracking</div>
+
+      <div class="stat-grid">
+        <div class="stat-card cyan">
+          <div class="stat-value" id="dash-total">0</div>
+          <div class="stat-label">Total Anomalies</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-value" id="dash-critical">0</div>
+          <div class="stat-label">Critical</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-value" id="dash-warning">0</div>
+          <div class="stat-label">Warning</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-value" id="dash-impact">$0</div>
+          <div class="stat-label">Financial Exposure</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-value" id="dash-agents">5</div>
+          <div class="stat-label">AI Agents Active</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="info-box">
+          <div class="info-box-title">Settlement Cycle Status</div>
+          <div class="info-row"><span class="info-key">Settlement period</span><span class="info-val" id="dash-period">—</span></div>
+          <div class="info-row"><span class="info-key">Rows analysed</span><span class="info-val" id="dash-rows">—</span></div>
+          <div class="info-row"><span class="info-key">Liquidity risk</span><span class="info-val" id="dash-liquidity">—</span></div>
+          <div class="info-row"><span class="info-key">Audit readiness</span><span class="info-val" id="dash-audit">—</span></div>
+          <div class="info-row"><span class="info-key">Last analysis</span><span class="info-val" id="dash-time">—</span></div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">Dispute Tracker</div>
+          <div class="info-row"><span class="info-key">Open disputes</span><span class="info-val" id="dash-open">—</span></div>
+          <div class="info-row"><span class="info-key">ERCOT deadline</span><span class="info-val">45 days</span></div>
+          <div class="info-row"><span class="info-key">MISO deadline</span><span class="info-val">30 days</span></div>
+          <div class="info-row"><span class="info-key">PJM deadline</span><span class="info-val">35 days</span></div>
+          <div class="info-row"><span class="info-key">Annual risk proj.</span><span class="info-val" id="dash-annual">—</span></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">Latest Anomalies</div>
+          <span style="font-family:var(--mono);font-size:0.72rem;color:var(--muted)">Upload CSV to populate</span>
+        </div>
+        <div id="dash-table-body">
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <p>No data yet. Go to <strong>Anomaly Detection</strong> tab and upload your settlement CSV to begin analysis.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANOMALY DETECTION TAB -->
+    <div id="tab-analyse" class="section">
+      <div class="page-title">Anomaly Detection</div>
+      <div class="page-sub">Upload your settlement CSV — AI analyses each line item against 5 rules</div>
+
+      <div class="upload-area">
+        <label for="csvFile">Drop your settlement_data.csv here or click to browse</label>
+        <input id="csvFile" type="file" accept=".csv" onchange="handleUpload(event)"/>
+        <button class="upload-btn" onclick="document.getElementById('csvFile').click()">Upload CSV File</button>
+      </div>
+
+      <div id="statusMsg" class="status-msg">Waiting for CSV upload...</div>
+
+      <div class="stat-grid">
+        <div class="stat-card cyan">
+          <div class="stat-value" id="totalAnomalies">0</div>
+          <div class="stat-label">Total Anomalies</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-value" id="criticalCount">0</div>
+          <div class="stat-label">Critical</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-value" id="warningCount">0</div>
+          <div class="stat-label">Warning</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-value" id="totalImpact">$0</div>
+          <div class="stat-label">Total Impact</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">Anomaly Results</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Severity</th><th>Charge Type</th><th>Expected</th><th>Actual</th><th>Variance %</th><th>Explanation</th><th>Recommended Action</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AI AGENT CHAT TAB -->
+    <div id="tab-chat" class="section">
+      <div class="page-title">AI Agent Chat</div>
+      <div class="page-sub">Ask any of your 5 specialist agents a question</div>
+
+      <div class="quick-questions">
+        <button class="quick-btn" onclick="setQuestion('Are there any price spikes in my settlement data?')">Price spike check</button>
+        <button class="quick-btn" onclick="setQuestion('What is my total financial exposure this settlement cycle?')">Financial exposure</button>
+        <button class="quick-btn" onclick="setQuestion('Is my settlement data FERC compliant?')">FERC compliance</button>
+        <button class="quick-btn" onclick="setQuestion('Can you give me a CFO summary?')">CFO summary</button>
+        <button class="quick-btn" onclick="setQuestion('Can you draft a dispute letter for my ISO/RTO?')">Draft dispute letter</button>
+        <button class="quick-btn" onclick="setQuestion('What should I do today to resolve these anomalies?')">Today\'s actions</button>
+      </div>
+
+      <div class="chat-wrap">
+        <div class="chat-header">
+          <div class="chat-header-dot"></div>
+          <div class="chat-header-title" id="chat-agent-name">Settlement Analysis Agent</div>
+          <div class="chat-header-sub" id="chat-agent-label">A1 · Routine Playbook</div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg agent">
+            <div class="msg-label">Settlement Analysis Agent</div>
+            Hello! I am your Settlement Analysis Agent for a US utility company. I can help you detect anomalies, calculate financial exposure, check compliance, explain findings in plain English, and draft dispute letters. How can I help you today?
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chatInput" placeholder="Ask the agent a question..." onkeydown="if(event.key==='Enter') sendChat()" />
+          <button class="chat-send" id="sendBtn" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL 5 AGENTS TAB -->
+    <div id="tab-agents" class="section">
+      <div class="page-title">All 5 AI Agents</div>
+      <div class="page-sub">Your complete AI agent architecture built on GCP Conversational Agents</div>
+
+      <div class="agent-grid">
+        <div class="agent-card">
+          <div class="agent-card-status status-live">LIVE</div>
+          <div class="agent-card-num">AGENT 01 · ROUTINE</div>
+          <div class="agent-card-name">Settlement Analysis</div>
+          <div class="agent-card-desc">Detects price spikes, missing credits, uplift irregularities and billing errors. Main controller that invokes all other agents.</div>
+          <div class="agent-card-tags">
+            <span class="tag">Rule 1–5</span><span class="tag">Price spike</span><span class="tag">Missing credit</span><span class="tag">Uplift</span>
+          </div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-card-status status-live">LIVE</div>
+          <div class="agent-card-num">AGENT 02 · TASK</div>
+          <div class="agent-card-name">Financial Impact</div>
+          <div class="agent-card-desc">Calculates real-time financial exposure, liquidity risk, annual projections and CFO-ready financial intelligence.</div>
+          <div class="agent-card-tags">
+            <span class="tag">Exposure</span><span class="tag">Liquidity risk</span><span class="tag">Annual proj.</span><span class="tag">CFO</span>
+          </div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-card-status status-live">LIVE</div>
+          <div class="agent-card-num">AGENT 03 · TASK</div>
+          <div class="agent-card-name">Rules & Compliance</div>
+          <div class="agent-card-desc">Validates against NERC/FERC rules, checks ERCOT/ISO protocols, flags deviations and assesses audit readiness.</div>
+          <div class="agent-card-tags">
+            <span class="tag">FERC</span><span class="tag">NERC</span><span class="tag">ERCOT</span><span class="tag">Audit</span>
+          </div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-card-status status-live">LIVE</div>
+          <div class="agent-card-num">AGENT 04 · TASK</div>
+          <div class="agent-card-name">NLP Explainability</div>
+          <div class="agent-card-desc">Generates plain English narratives for regulators, CFO briefs, board summaries and root cause explanations.</div>
+          <div class="agent-card-tags">
+            <span class="tag">Plain English</span><span class="tag">Regulator</span><span class="tag">Board brief</span><span class="tag">URI ref</span>
+          </div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-card-status status-live">LIVE</div>
+          <div class="agent-card-num">AGENT 05 · TASK</div>
+          <div class="agent-card-name">Action & Dispute</div>
+          <div class="agent-card-desc">Auto-drafts dispute letters, tracks ISO/RTO deadlines, queues regulatory filings and generates corrective action plans.</div>
+          <div class="agent-card-tags">
+            <span class="tag">Dispute letter</span><span class="tag">ISO/RTO</span><span class="tag">45-day window</span><span class="tag">FERC filing</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title">Architecture Details</div>
+        <div class="info-row"><span class="info-key">Platform</span><span class="info-val">GCP Conversational Agents</span></div>
+        <div class="info-row"><span class="info-key">Model</span><span class="info-val">gemini-2.5-flash</span></div>
+        <div class="info-row"><span class="info-key">Routine playbooks</span><span class="info-val">1</span></div>
+        <div class="info-row"><span class="info-key">Task playbooks</span><span class="info-val">4</span></div>
+        <div class="info-row"><span class="info-key">Training examples</span><span class="info-val">10 total (2 per agent)</span></div>
+        <div class="info-row"><span class="info-key">Frontend</span><span class="info-val">HTML + JS (VSCode)</span></div>
+        <div class="info-row"><span class="info-key">Backend</span><span class="info-val">Python Flask (app.py)</span></div>
+        <div class="info-row"><span class="info-key">Cost</span><span class="info-val">Free tier</span></div>
+      </div>
+    </div>
+
+    <!-- CFO SUMMARY TAB -->
+    <div id="tab-cfo" class="section">
+      <div class="page-title">CFO Summary</div>
+      <div class="page-sub">Executive financial summary for CFO and board level reporting</div>
+
+      <div class="stat-grid">
+        <div class="stat-card red">
+          <div class="stat-value" id="cfo-exposure">$0</div>
+          <div class="stat-label">Total Exposure</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-value" id="cfo-annual">$0</div>
+          <div class="stat-label">Annual Risk Projection</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-value" id="cfo-critical">0</div>
+          <div class="stat-label">Critical Anomalies</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-value" id="cfo-warning">0</div>
+          <div class="stat-label">Warning Anomalies</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="info-box">
+          <div class="info-box-title">Priority Actions</div>
+          <div id="cfo-actions">
+            <div class="empty-state">
+              <div class="empty-state-icon">📋</div>
+              <p>Upload settlement data in the Anomaly Detection tab to generate CFO priority actions.</p>
+            </div>
+          </div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">Resolution Timeline</div>
+          <div class="info-row"><span class="info-key">Within 24 hours</span><span class="info-val">Notify treasury</span></div>
+          <div class="info-row"><span class="info-key">Within 30 days</span><span class="info-val">MISO dispute filing</span></div>
+          <div class="info-row"><span class="info-key">Within 35 days</span><span class="info-val">PJM dispute filing</span></div>
+          <div class="info-row"><span class="info-key">Within 45 days</span><span class="info-val">ERCOT dispute filing</span></div>
+          <div class="info-row"><span class="info-key">Within 90 days</span><span class="info-val">Audit trail complete</span></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">CFO Anomaly Report</div>
+        </div>
+        <div id="cfo-table">
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <p>Upload settlement CSV in Anomaly Detection tab to generate full CFO report.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const GEMINI_KEY = 'AIzaSyC6upPaPpOB_EUUhuaQja_TbZi7QNjUPAk';
+const GEMINI_MODEL = 'gemini-2.0-flash';
+
+// Agent configurations
+const AGENTS = {
+  settlement: { name: 'Settlement Analysis Agent', label: 'A1 · Routine Playbook', color: '#00c6e0' },
+  financial:  { name: 'Financial Impact Agent',    label: 'A2 · Task Playbook',    color: '#3b82f6' },
+  compliance: { name: 'Rules & Compliance Agent',  label: 'A3 · Task Playbook',    color: '#10b981' },
+  nlp:        { name: 'NLP Explainability Agent',  label: 'A4 · Task Playbook',    color: '#f59e0b' },
+  dispute:    { name: 'Action & Dispute Agent',     label: 'A5 · Task Playbook',    color: '#e53935' }
+};
+
+const AGENT_PROMPTS = {
+  settlement: `You are a Settlement Analysis Agent for a US utility company. Detect financial anomalies in settlement data. Use these rules: RULE 1: variance >500% = CRITICAL price spike. RULE 2: variance >15% or <-15% = WARNING. RULE 3: uplift actual >baseline x1.20 = WARNING. RULE 4: expected negative but actual is 0 = CRITICAL missing credit. RULE 5: expected >$1000 but actual is 0 = WARNING. For each anomaly provide severity, explanation, financial impact and recommended action. Be concise and professional.`,
+  financial:  `You are a Financial Impact Analyst for a US utility company. Calculate total financial exposure, liquidity risk, annual projections. Flag HIGH liquidity risk if exposure >$100,000. Recommend CFO escalation if annual risk >$1,000,000. Be concise and professional.`,
+  compliance: `You are a Rules and Compliance Analyst for a US utility company. Validate against NERC/FERC rules and ERCOT/ISO protocols. Flag deviations as CRITICAL or WARNING. Assess audit readiness. Reference specific rule numbers. Be concise and professional.`,
+  nlp:        `You are an Explainability Analyst for a US utility company. Convert technical settlement data into plain English for CFO, board and regulators. Reference URI winter storm when explaining scarcity pricing. Avoid jargon. Be concise and professional.`,
+  dispute:    `You are a Dispute and Action Specialist for a US utility company. Draft dispute letters for ISO/RTO submission. Track deadlines: ERCOT 45 days, MISO 30 days, PJM 35 days. Recommend corrective actions. Flag urgent disputes. Be concise and professional.`
+};
+
+let currentAgent = 'settlement';
+let lastAnomalies = [];
+let chatHistory = [];
+
+// ─── TAB NAVIGATION ───────────────────────────────────────
+function showTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ─── AGENT SWITCH ─────────────────────────────────────────
+function switchAgent(agent) {
+  currentAgent = agent;
+  document.querySelectorAll('.agent-btn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const a = AGENTS[agent];
+  document.getElementById('chat-agent-name').textContent = a.name;
+  document.getElementById('chat-agent-label').textContent = a.label;
+  document.getElementById('chatMessages').innerHTML = `
+    <div class="chat-msg agent">
+      <div class="msg-label">${a.name}</div>
+      Hello! I am the ${a.name}. How can I help you today?
+    </div>`;
+  chatHistory = [];
+}
+
+// ─── QUICK QUESTIONS ──────────────────────────────────────
+function setQuestion(q) {
+  document.getElementById('chatInput').value = q;
+  showTab('chat');
+  document.querySelectorAll('.nav-tab')[2].classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i) => { if(i!==2) t.classList.remove('active'); });
+}
+
+// ─── CHAT ─────────────────────────────────────────────────
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const btn = document.getElementById('sendBtn');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  appendMsg('user', msg);
+  input.value = '';
+  btn.disabled = true;
+
+  const thinkingId = appendMsg('agent', '<span class="spinner"></span>Thinking...', true);
+
+  try {
+    const systemPrompt = AGENT_PROMPTS[currentAgent];
+    const contextNote = lastAnomalies.length > 0
+      ? `\n\nContext from latest CSV analysis: ${JSON.stringify(lastAnomalies.slice(0,5))}`
+      : '';
+
+    const fullPrompt = systemPrompt + contextNote + '\n\nUser: ' + msg;
+    const reply = await callGemini(fullPrompt);
+    updateMsg(thinkingId, reply);
+  } catch(e) {
+    updateMsg(thinkingId, 'Error: ' + e.message);
+  }
+  btn.disabled = false;
+}
+
+function appendMsg(role, text, isTemp) {
+  const msgs = document.getElementById('chatMessages');
+  const id = 'msg-' + Date.now();
+  const agentName = AGENTS[currentAgent].name;
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  div.id = id;
+  if (role === 'agent') {
+    div.innerHTML = `<div class="msg-label">${agentName}</div>${text}`;
+  } else {
+    div.textContent = text;
+  }
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return id;
+}
+
+function updateMsg(id, text) {
+  const el = document.getElementById(id);
+  const agentName = AGENTS[currentAgent].name;
+  if (el) el.innerHTML = `<div class="msg-label">${agentName}</div>${text.replace(/\n/g,'<br>')}`;
+}
+
+// ─── CSV UPLOAD ───────────────────────────────────────────
+async function handleUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  setStatus('loading', '<span class="spinner"></span>Reading CSV and analysing with Gemini AI...');
+  document.getElementById('resultsBody').innerHTML = '';
+
+  try {
+    const text = await file.text();
+    const rows = parseCSV(text);
+    if (rows.length === 0) throw new Error('No rows found in CSV');
+
+    const csvPreview = [Object.keys(rows[0]).join(','), ...rows.map(r => Object.values(r).join(','))].join('\n');
+
+    const prompt = `You are a Settlement Analysis Agent for a US utility company. Analyse this settlement CSV and detect anomalies using these rules:
+RULE 1: If variance between expected and actual exceeds 500% flag as CRITICAL price spike.
+RULE 2: If variance is >15% or <-15% flag as WARNING for high variance.
+RULE 3: If charge type is uplift and actual exceeds 30-day baseline by >20% flag as WARNING.
+RULE 4: If a credit was expected (negative expected value) but actual value is zero flag as CRITICAL missing credit.
+RULE 5: If expected value exceeds $1000 but actual is zero flag as WARNING for missing charge.
+For each anomaly found provide: severity, charge_type, expected, actual, variance_pct, explanation, action.
+Respond ONLY with a valid JSON array. No preamble. No markdown.
+CSV:
+${csvPreview}`;
+
+    const responseText = await callGemini(prompt);
+    const anomalies = parseAnomalies(responseText);
+    lastAnomalies = anomalies;
+    renderResults(anomalies);
+    updateDashboard(anomalies, rows.length);
+    setStatus('success', `Analysis complete. Found ${anomalies.length} anomaly(ies) across ${rows.length} rows.`);
+  } catch(err) {
+    setStatus('error', 'Error: ' + err.message);
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/).filter(Boolean);
+  if (!lines.length) return [];
+  const headers = lines[0].split(',').map(h => h.trim());
+  return lines.slice(1).map(line => {
+    const values = line.split(',').map(v => v.trim());
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = values[i] ?? '');
+    return obj;
+  });
+}
+
+async function callGemini(prompt) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.2, maxOutputTokens: 1200 }
+  };
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error(`Gemini API error: ${res.status}`);
+  const data = await res.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+function parseAnomalies(text) {
+  let parsed;
+  try { parsed = JSON.parse(text); }
+  catch(e) {
+    const m = text.match(/(\[[\s\S]*\])/);
+    if (m) parsed = JSON.parse(m[1]);
+    else throw new Error('Could not parse Gemini response');
+  }
+  if (!Array.isArray(parsed)) throw new Error('Response is not a JSON array');
+  return parsed.map(item => ({
+    severity: String(item.severity || 'WARNING').toUpperCase(),
+    charge_type: String(item.charge_type || 'Unknown'),
+    expected: String(item.expected || '0'),
+    actual: String(item.actual || '0'),
+    variance_pct: String(item.variance_pct || '0'),
+    explanation: String(item.explanation || ''),
+    action: String(item.action || 'Review')
+  }));
+}
+
+function renderResults(anomalies) {
+  const tbody = document.getElementById('resultsBody');
+  tbody.innerHTML = '';
+  let critical = 0, warning = 0, total = 0;
+
+  anomalies.forEach(row => {
+    const sev = row.severity;
+    const tr = document.createElement('tr');
+    if (sev === 'CRITICAL') { tr.classList.add('critical'); critical++; }
+    else { tr.classList.add('warning'); warning++; }
+
+    const exp = parseNum(row.expected);
+    const act = parseNum(row.actual);
+    total += Math.abs(act - exp);
+
+    tr.innerHTML = `
+      <td><span class="badge badge-${sev.toLowerCase()}">${sev}</span></td>
+      <td>${esc(row.charge_type)}</td>
+      <td>${esc(row.expected)}</td>
+      <td>${esc(row.actual)}</td>
+      <td>${esc(row.variance_pct)}</td>
+      <td>${esc(row.explanation)}</td>
+      <td>${esc(row.action)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('totalAnomalies').textContent = anomalies.length;
+  document.getElementById('criticalCount').textContent = critical;
+  document.getElementById('warningCount').textContent = warning;
+  document.getElementById('totalImpact').textContent = fmtCurrency(total);
+}
+
+function updateDashboard(anomalies, rowCount) {
+  const critical = anomalies.filter(a => a.severity === 'CRITICAL').length;
+  const warning = anomalies.filter(a => a.severity === 'WARNING').length;
+  let total = 0;
+  anomalies.forEach(a => { total += Math.abs(parseNum(a.actual) - parseNum(a.expected)); });
+  const annual = total * 12;
+
+  document.getElementById('dash-total').textContent = anomalies.length;
+  document.getElementById('dash-critical').textContent = critical;
+  document.getElementById('dash-warning').textContent = warning;
+  document.getElementById('dash-impact').textContent = fmtCurrency(total);
+  document.getElementById('dash-rows').textContent = rowCount;
+  document.getElementById('dash-time').textContent = new Date().toLocaleTimeString();
+  document.getElementById('dash-liquidity').textContent = total > 100000 ? 'HIGH ⚠' : 'NORMAL';
+  document.getElementById('dash-audit').textContent = critical > 0 ? 'NOT READY ✗' : 'READY ✓';
+  document.getElementById('dash-open').textContent = critical;
+  document.getElementById('dash-annual').textContent = fmtCurrency(annual);
+
+  document.getElementById('cfo-exposure').textContent = fmtCurrency(total);
+  document.getElementById('cfo-annual').textContent = fmtCurrency(annual);
+  document.getElementById('cfo-critical').textContent = critical;
+  document.getElementById('cfo-warning').textContent = warning;
+
+  // CFO actions
+  const actionsHtml = anomalies.map((a,i) => `
+    <div class="info-row">
+      <span class="info-key"><span class="badge badge-${a.severity.toLowerCase()}">${a.severity}</span> ${esc(a.charge_type)}</span>
+      <span class="info-val" style="font-size:0.75rem;max-width:55%;text-align:right">${esc(a.action)}</span>
+    </div>`).join('');
+  document.getElementById('cfo-actions').innerHTML = actionsHtml || '<div class="empty-state"><p>No anomalies found.</p></div>';
+
+  // Dashboard table
+  const tableHtml = `<table>
+    <thead><tr>
+      <th>Severity</th><th>Charge Type</th><th>Explanation</th><th>Action</th>
+    </tr></thead>
+    <tbody>${anomalies.map(a => `
+      <tr class="${a.severity.toLowerCase()}">
+        <td><span class="badge badge-${a.severity.toLowerCase()}">${a.severity}</span></td>
+        <td>${esc(a.charge_type)}</td>
+        <td>${esc(a.explanation)}</td>
+        <td>${esc(a.action)}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  document.getElementById('dash-table-body').innerHTML = tableHtml;
+  document.getElementById('cfo-table').innerHTML = tableHtml;
+}
+
+// ─── HELPERS ──────────────────────────────────────────────
+function setStatus(type, msg) {
+  const el = document.getElementById('statusMsg');
+  el.className = 'status-msg ' + type;
+  el.innerHTML = msg;
+}
+
+function fmtCurrency(v) {
+  const n = Number(String(v).replace(/[^0-9.\-]/g,''));
+  if (isNaN(n)) return String(v);
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+}
+
+function parseNum(v) {
+  const n = Number(String(v).replace(/[^0-9.\-]/g,''));
+  return isFinite(n) ? n : 0;
+}
+
+function esc(t) {
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
