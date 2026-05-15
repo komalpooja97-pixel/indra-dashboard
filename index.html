@@ -1447,7 +1447,7 @@ async function sendChat(){
   addMsg('user',msg);inp.value='';btn.disabled=true;
   const tid=addMsg('agent','<span class="spin"></span>Analysing...');
   try{
-    const res=await fetch('http://localhost:5000/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,agent:curAg})});
+    const res=await fetch(''https://indra-dashboard.onrender.com/analyse'',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,agent:curAg})});
     const data=await res.json();
     updMsg(tid,data.response||'Error getting response');
   }catch(e){updMsg(tid,'Error: '+e.message);}
