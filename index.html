@@ -442,7 +442,7 @@ body{font-family:var(--body);background:var(--ink);color:var(--text);display:fle
   <!-- PLATFORM -->
   <div style="padding:7px 10px">
     <div class="sb-sec" style="padding:0 0 4px">INDRA PLATFORM</div>
-    <div style="font-family:var(--mono);font-size:.56rem;color:rgba(74,111,153,.6);line-height:1.9">GCP: settlement-agent-495606<br>Region: us-central1<br>Model: gemini-1.5-flash<br><span style="color:rgba(0,200,120,.55)">Free Tier · $0</span></div>
+    <div style="font-family:var(--mono);font-size:.56rem;color:rgba(74,111,153,.6);line-height:1.9">GCP: settlement-agent-495606<br>Region: us-central1<br>Model: gemini-2.5-flash<br><span style="color:rgba(0,200,120,.55)">Free Tier · $0</span></div>
   </div>
 
 </div>
@@ -1446,7 +1446,7 @@ async function sendChat(){
   const msg=inp.value.trim();if(!msg)return;
   addMsg('user',msg);inp.value='';btn.disabled=true;
   const tid=addMsg('agent','<span class="spin"></span>Analysing...');
-  await orchestrate(msg);const r=await callGemini(`${ag.p}\n\nDATA:\n${CTX}\n\nQ: ${msg}`);updMsg(tid,r);}
+  try{const ag=AGENTS[curAg];const r=await callGemini(`${ag.p}\n\nDATA:\n${CTX}\n\nQ: ${msg}`);updMsg(tid,r);}
   catch(e){updMsg(tid,'Error: '+e.message);}
   btn.disabled=false;
 }
@@ -1682,7 +1682,7 @@ const RPTS={
   cfo:{title:'CFO EXECUTIVE BRIEF',sub:'Agent 4 NLP · Feb 10–12, 2024 · Ready to send',content:`CONFIDENTIAL — CFO EXECUTIVE BRIEF\nPeriod: February 10–12, 2024 | INDRA AI Platform\n\nSUMMARY: 7 anomalies, $1,522,500 exposure. 3 CRITICAL URI-pattern scarcity events.\nAnnual projection: $18,270,000. Board escalation required.\n\nCRITICAL: 3-hour scarcity event Feb 11 06:00–08:00. $1,443,000 disputed.\nMissing REC $4,500 + Ancillary $3,100 = $7,600 direct leakage.\n\nACTIONS: Treasury today · Disputes within 45 days · REC in 5 days · Board escalation.\n\nRef: INDRA-CFO-20240212`},
   board:{title:'BOARD SUMMARY',sub:'Agent 4 NLP · Plain English · Non-technical',content:`BOARD SUMMARY — SETTLEMENT ANOMALY REPORT\nFebruary 2024 | INDRA AI Platform | CONFIDENTIAL\n\nSITUATION: AI flagged billing anomaly Feb 11. Energy charges spiked 35–40x normal\nrate during grid stress event — similar to 2021 URI Winter Storm.\n\nFINANCIAL: Overcharged $1,443,000. Other leakage $79,500. Total: $1,522,500.\nAnnual risk: $18,270,000.\n\nACTION: AI drafted disputes. Treasury notified. Recovery expected within 45 days.\nAI reduced detection time from 30 days to <24 hours.\n\nRef: INDRA-BOARD-20240212`},
   regulatory:{title:'REGULATORY NARRATIVE — FERC/NERC FILING',sub:'Agent 4 NLP + Agent 3 Compliance · Audit-ready',content:`REGULATORY NARRATIVE — SETTLEMENT DISPUTE FILING\nFERC Complaint Procedures / ERCOT Protocol §6.5.7\n\nDuring Feb 11 2024, Zone A recorded energy charges of $450K/MWh (06:00 DAM),\n$495K/MWh (07:00 RTM), $540K/MWh (08:00 RTM) vs forecast $13K–$15K/MWh.\n\nVariance of 3,361–3,500% consistent with ORDC scarcity pricing activation.\nGrid frequency recorded at 59.87 Hz. 480 MW forced generation offline.\n3-hour sustained application exceeds ERCOT Protocol §6.5.7 duration threshold.\n\nREC credit of $4,500 not posted — direct revenue leakage.\n\nRELIEF REQUESTED: Full audit within 45-day dispute window.\n\nRef: INDRA-REG-20240212`},
-  audit:{title:'INTERNAL AUDIT REPORT',sub:'Complete trail · Rules triggered · Agent outputs',content:`INTERNAL AUDIT REPORT\nPeriod: Feb 10–12 2024 | INDRA AI | settlement-agent-495606\n\nANALYSIS: 30 rows · 7 anomalies · 3 CRITICAL · 4 WARNING · Rules 1–5 active\nModel: gemini-1.5-flash · Time: <3 seconds · Frequency at event: 59.87 Hz\n\nANOMALY LOG:\n[CRIT] Feb11 06:00 DAM Energy $13K→$450K RULE1 → Dispute filed\n[CRIT] Feb11 07:00 RTM Energy $14K→$495K RULE1 → Dispute filed\n[CRIT] Feb11 08:00 RTM Energy $15K→$540K RULE1 → Dispute filed\n[WARN] Feb11 09:00 DAM Uplift $8K→$42K RULE3 → Regulatory review\n[WARN] Feb11 10:00 RTM Uplift $7.5K→$38.5K RULE3 → Regulatory review\n[WARN] Feb11 13:00 DAM Ancillary $3.1K→$0 RULE5 → Billing check\n[WARN] Feb11 14:00 DAM REC -$4.5K→$0 RULE4 → Recovery filed\n\nACTIONS: All 5 agents invoked · Disputes drafted · CFO notified\nAUDIT STATUS: Complete | Ref: INDRA-AUDIT-20240212`},
+  audit:{title:'INTERNAL AUDIT REPORT',sub:'Complete trail · Rules triggered · Agent outputs',content:`INTERNAL AUDIT REPORT\nPeriod: Feb 10–12 2024 | INDRA AI | settlement-agent-495606\n\nANALYSIS: 30 rows · 7 anomalies · 3 CRITICAL · 4 WARNING · Rules 1–5 active\nModel: gemini-2.5-flash · Time: <3 seconds · Frequency at event: 59.87 Hz\n\nANOMALY LOG:\n[CRIT] Feb11 06:00 DAM Energy $13K→$450K RULE1 → Dispute filed\n[CRIT] Feb11 07:00 RTM Energy $14K→$495K RULE1 → Dispute filed\n[CRIT] Feb11 08:00 RTM Energy $15K→$540K RULE1 → Dispute filed\n[WARN] Feb11 09:00 DAM Uplift $8K→$42K RULE3 → Regulatory review\n[WARN] Feb11 10:00 RTM Uplift $7.5K→$38.5K RULE3 → Regulatory review\n[WARN] Feb11 13:00 DAM Ancillary $3.1K→$0 RULE5 → Billing check\n[WARN] Feb11 14:00 DAM REC -$4.5K→$0 RULE4 → Recovery filed\n\nACTIONS: All 5 agents invoked · Disputes drafted · CFO notified\nAUDIT STATUS: Complete | Ref: INDRA-AUDIT-20240212`},
   scada:{title:'SCADA INTEGRATION REPORT',sub:'Data source health · AMI sync · Metering reconciliation',content:`SCADA/AMI INTEGRATION STATUS REPORT\nPeriod: Feb 10–12 2024 | INDRA AI Platform\n\nDATA SOURCE HEALTH:\n  SCADA Real-time: LIVE · Latency <1s\n  AMI Smart Meters: SYNC · 847 meters · 99.2% uptime\n  ERP/Billing: CONNECTED · Auto-reconcile ON\n  REC Registry: 3-MINUTE LAG · Auto-retry active\n  ISO/RTO Settlement: SYNC · 5-min blocks\n  PPA Contracts: OK · Auto-match active\n\nFREQUENCY: 59.87 Hz recorded at event peak (06:00–08:00 Feb 11)\nSCADA confirms grid stress — NOT metering error.\n\nRECOMMENDATIONS:\n  1. Reduce SCADA sync 5min→1min during high-variance periods\n  2. Auto-reconcile REC Registry to eliminate 3-min lag\n  3. Connect AMI directly to anomaly detection pipeline\n\nRef: INDRA-SCADA-20240212`}
 };
 function showReport(type,el){
@@ -1960,7 +1960,7 @@ Ref: INDRA-CFO-${new Date().toISOString().split('T')[0]} | Auto-generated by Age
 
     case 'audit_report_txt': {
       const txt = `INTERNAL AUDIT REPORT — INDRA AI SETTLEMENT INTELLIGENCE
-Period: Feb 10–12, 2024 | GCP: settlement-agent-495606 | Model: gemini-1.5-flash
+Period: Feb 10–12, 2024 | GCP: settlement-agent-495606 | Model: gemini-2.5-flash
 Generated: ${new Date().toISOString()}
 
 ANALYSIS SUMMARY
@@ -1968,7 +1968,7 @@ ANALYSIS SUMMARY
 Rows analysed:      30
 Anomalies found:    7 (3 CRITICAL, 4 WARNING)
 Rules applied:      RULE 1–5 (all active)
-AI model:           gemini-1.5-flash
+AI model:           gemini-2.5-flash
 Analysis time:      <3 seconds
 Frequency at event: 59.87 Hz (below NERC 59.95 normal)
 Generation offline: 480 MW (Unit 4 + Unit 7 forced outages)
